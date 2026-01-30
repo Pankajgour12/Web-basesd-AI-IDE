@@ -7,10 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  PREMIUM_USER
+}
+
+
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts Account[]
+  role     UserRole  @default(USER)
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @map("userId")
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @map("refresh_token")
+  access_token      String? @map("access_token")
+ 
+  expires_at        Int?
+  token_type        String? @map("token_type")
+  scope             String?
+  id_token          String? @map("id_token")
+  session_state     String? @map("session_state")
+
+  // Yeh line sabse important hai jo tere code mein missing thi 👇
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
