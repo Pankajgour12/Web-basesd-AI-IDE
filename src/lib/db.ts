@@ -1,13 +1,13 @@
-import { prismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as {
-  prisma: prismaClient 
+
+
+import { PrismaClient } from "@prisma/client";
+
+declare global {
+  var prisma: PrismaClient | undefined;
 }
 
+// Global variable use karte hain taaki hot-reload pe baar-baar naye connection na bane
+export const db = globalThis.prisma || new PrismaClient();
 
-export const db = globalForPrisma.prisma || new prismaClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
-
-
-
+if (process.env.NODE_ENV !== "production") globalThis.prisma = db;
